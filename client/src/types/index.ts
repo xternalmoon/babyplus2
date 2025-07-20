@@ -7,6 +7,9 @@ export interface Address {
   zipCode: string;
   country: string;
   phone?: string;
+  thana?: string;
+  landmark?: string;
+  instructions?: string;
 }
 
 export interface CartItemWithProduct {

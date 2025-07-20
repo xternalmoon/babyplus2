@@ -245,9 +245,9 @@ export default function ProductDetail() {
             </div>
             
             <div className="flex items-center space-x-4 mb-4">
-              <span className="text-3xl font-bold text-baby-primary">${product.price}</span>
+              <span className="text-3xl font-bold text-baby-primary">৳{product.price}</span>
               {product.originalPrice && (
-                <span className="text-xl text-gray-500 line-through">${product.originalPrice}</span>
+                <span className="text-xl text-gray-500 line-through">৳{product.originalPrice}</span>
               )}
             </div>
             

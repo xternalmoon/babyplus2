@@ -152,7 +152,7 @@ export default function Home() {
                 <Truck className="w-8 h-8 text-white" />
               </div>
               <h4 className="text-xl font-semibold text-baby-primary mb-2">Free Shipping</h4>
-              <p className="text-gray-600">Free delivery on all orders over $50 with fast processing</p>
+              <p className="text-gray-600">Free delivery on all orders over ৳5000 with fast processing</p>
             </div>
 
             <div className="text-center">

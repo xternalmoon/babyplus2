@@ -402,7 +402,7 @@ export default function Profile() {
                     <div>
                       <p className="text-sm text-gray-600">Total Spent</p>
                       <p className="text-2xl font-bold text-baby-primary">
-                        ${orders?.reduce((sum, order) => sum + parseFloat(order.total), 0).toFixed(2) || "0.00"}
+                        ৳{orders?.reduce((sum, order) => sum + parseFloat(order.total), 0).toFixed(2) || "0.00"}
                       </p>
                     </div>
                     <span className="text-2xl">💰</span>

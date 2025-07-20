@@ -115,9 +115,8 @@ export default function Cart() {
 
   // Calculate totals
   const subtotal = items.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
-  const shipping = subtotal >= 50 ? 0 : 9.99; // Free shipping over $50
-  const tax = subtotal * 0.08; // 8% tax
-  const total = subtotal + shipping + tax;
+  const shipping = subtotal >= 5000 ? 0 : 500; // Free shipping over ৳5000
+  const total = subtotal + shipping;
 
   const handleApplyPromo = () => {
     if (!promoCode.trim()) {
@@ -193,22 +192,18 @@ export default function Cart() {
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Subtotal</span>
-                    <span className="font-medium">${subtotal.toFixed(2)}</span>
+                    <span className="font-medium">৳{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping</span>
                     <span className={`font-medium ${shipping === 0 ? "text-baby-green" : ""}`}>
-                      {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
+                      {shipping === 0 ? "Free" : `৳${shipping.toFixed(2)}`}
                     </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Tax</span>
-                    <span className="font-medium">${tax.toFixed(2)}</span>
                   </div>
                   <Separator />
                   <div className="flex justify-between">
                     <span className="text-lg font-semibold text-baby-primary">Total</span>
-                    <span className="text-lg font-bold text-baby-primary">${total.toFixed(2)}</span>
+                    <span className="text-lg font-bold text-baby-primary">৳{total.toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -234,9 +229,9 @@ export default function Cart() {
                       Apply
                     </Button>
                   </div>
-                  {subtotal < 50 && (
+                  {subtotal < 5000 && (
                     <p className="text-sm text-gray-600 mt-2">
-                      Add ${(50 - subtotal).toFixed(2)} more for free shipping!
+                      Add ৳{(5000 - subtotal).toFixed(2)} more for free shipping!
                     </p>
                   )}
                 </div>

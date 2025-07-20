@@ -128,7 +128,7 @@ export default function CartItem({ item }: CartItemProps) {
             Color: {item.color}
           </Badge>
         </div>
-        <p className="text-baby-accent font-medium mt-1">${item.price}</p>
+        <p className="text-baby-accent font-medium mt-1">৳{item.price}</p>
         
         {/* Stock Warning */}
         {item.product.stock <= 5 && (
@@ -175,9 +175,9 @@ export default function CartItem({ item }: CartItemProps) {
 
       {/* Item Total */}
       <div className="text-right min-w-0">
-        <p className="font-semibold text-baby-primary">${itemTotal.toFixed(2)}</p>
+        <p className="font-semibold text-baby-primary">৳{itemTotal.toFixed(2)}</p>
         {quantity > 1 && (
-          <p className="text-xs text-gray-500">${item.price} each</p>
+          <p className="text-xs text-gray-500">৳{item.price} each</p>
         )}
       </div>
 

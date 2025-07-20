@@ -23,30 +23,31 @@ const checkoutSchema = z.object({
   // Shipping Address
   shippingFirstName: z.string().min(1, "First name is required"),
   shippingLastName: z.string().min(1, "Last name is required"),
-  shippingStreet: z.string().min(1, "Street address is required"),
-  shippingCity: z.string().min(1, "City is required"),
-  shippingState: z.string().min(1, "State is required"),
-  shippingZipCode: z.string().min(5, "ZIP code must be at least 5 characters"),
-  shippingCountry: z.string().min(1, "Country is required"),
-  shippingPhone: z.string().optional(),
+  shippingStreet: z.string().min(1, "Street Address / Village / Area is required"),
+  shippingDistrict: z.string().min(1, "District is required"),
+  shippingThana: z.string().min(1, "Thana / Upazila is required"),
+  shippingPostCode: z.string().min(4, "Post Code must be at least 4 characters"),
+  shippingDivision: z.string().min(1, "Division is required"),
+  shippingLandmark: z.string().optional(),
+  shippingInstructions: z.string().optional(),
+  shippingPhone: z.string().min(1, "Phone number is required"),
   
   // Billing Address
   sameAsShipping: z.boolean().default(true),
   billingFirstName: z.string().optional(),
   billingLastName: z.string().optional(),
   billingStreet: z.string().optional(),
-  billingCity: z.string().optional(),
-  billingState: z.string().optional(),
-  billingZipCode: z.string().optional(),
-  billingCountry: z.string().optional(),
+  billingDistrict: z.string().optional(),
+  billingThana: z.string().optional(),
+  billingPostCode: z.string().optional(),
+  billingDivision: z.string().optional(),
+  billingLandmark: z.string().optional(),
+  billingInstructions: z.string().optional(),
   billingPhone: z.string().optional(),
   
   // Payment
-  paymentMethod: z.enum(["card", "paypal"]),
-  cardNumber: z.string().optional(),
-  expiryDate: z.string().optional(),
-  cvv: z.string().optional(),
-  cardName: z.string().optional(),
+  paymentMethod: z.enum(["cash_on_delivery", "bkash"]),
+  bkashNumber: z.string().optional(),
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
@@ -73,9 +74,9 @@ export default function Checkout() {
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
       sameAsShipping: true,
-      paymentMethod: "card",
-      shippingCountry: "United States",
-      billingCountry: "United States",
+      paymentMethod: "cash_on_delivery",
+      shippingDivision: "Dhaka",
+      billingDivision: "Dhaka",
     },
   });
 
@@ -100,36 +101,41 @@ export default function Checkout() {
       const items = cartData?.items || [];
       const subtotal = items.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
       const shipping = subtotal >= 5000 ? 0 : 500; // Free shipping over ৳5000, otherwise ৳500
-      const tax = subtotal * 0.08;
-      const total = subtotal + shipping + tax;
+      const total = subtotal + shipping; // No tax
 
       const shippingAddress: Address = {
         firstName: data.shippingFirstName,
         lastName: data.shippingLastName,
         street: data.shippingStreet,
-        city: data.shippingCity,
-        state: data.shippingState,
-        zipCode: data.shippingZipCode,
-        country: data.shippingCountry,
+        city: data.shippingDistrict,
+        state: data.shippingDivision,
+        zipCode: data.shippingPostCode,
+        country: "Bangladesh",
         phone: data.shippingPhone,
+        thana: data.shippingThana,
+        landmark: data.shippingLandmark,
+        instructions: data.shippingInstructions,
       };
 
       const billingAddress: Address = data.sameAsShipping ? shippingAddress : {
         firstName: data.billingFirstName || "",
         lastName: data.billingLastName || "",
         street: data.billingStreet || "",
-        city: data.billingCity || "",
-        state: data.billingState || "",
-        zipCode: data.billingZipCode || "",
-        country: data.billingCountry || "",
+        city: data.billingDistrict || "",
+        state: data.billingDivision || "",
+        zipCode: data.billingPostCode || "",
+        country: "Bangladesh",
         phone: data.billingPhone,
+        thana: data.billingThana,
+        landmark: data.billingLandmark,
+        instructions: data.billingInstructions,
       };
 
       const orderData = {
         orderNumber: `BP-${Date.now()}`,
         status: "pending",
         subtotal: subtotal.toString(),
-        tax: tax.toString(),
+        tax: "0",
         shipping: shipping.toString(),
         total: total.toString(),
         shippingAddress,
@@ -232,9 +238,8 @@ export default function Checkout() {
 
   const items = cartData?.items || [];
   const subtotal = items.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
-  const shipping = subtotal >= 50 ? 0 : 9.99;
-  const tax = subtotal * 0.08;
-  const total = subtotal + shipping + tax;
+  const shipping = subtotal >= 5000 ? 0 : 500;
+  const total = subtotal + shipping;
 
   return (
     <div className="min-h-screen bg-baby-secondary">
@@ -296,24 +301,24 @@ export default function Checkout() {
                     name="shippingStreet"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Street Address</FormLabel>
+                        <FormLabel>Street Address / Village / Area</FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Input {...field} placeholder="House/Road number, Village or Area name" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
-                      name="shippingCity"
+                      name="shippingDistrict"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>City</FormLabel>
+                          <FormLabel>District</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} placeholder="e.g., Dhaka, Chittagong" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -321,25 +326,28 @@ export default function Checkout() {
                     />
                     <FormField
                       control={form.control}
-                      name="shippingState"
+                      name="shippingThana"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>State</FormLabel>
+                          <FormLabel>Thana / Upazila</FormLabel>
                           <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="shippingZipCode"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>ZIP Code</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select Thana/Upazila" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="dhanmondi">Dhanmondi</SelectItem>
+                                <SelectItem value="gulshan">Gulshan</SelectItem>
+                                <SelectItem value="uttara">Uttara</SelectItem>
+                                <SelectItem value="banani">Banani</SelectItem>
+                                <SelectItem value="mirpur">Mirpur</SelectItem>
+                                <SelectItem value="mohammadpur">Mohammadpur</SelectItem>
+                                <SelectItem value="tejgaon">Tejgaon</SelectItem>
+                                <SelectItem value="wari">Wari</SelectItem>
+                                <SelectItem value="old-dhaka">Old Dhaka</SelectItem>
+                                <SelectItem value="other">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -347,14 +355,85 @@ export default function Checkout() {
                     />
                   </div>
                   
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="shippingPostCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Post Code</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="e.g., 1000" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="shippingDivision"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Division</FormLabel>
+                          <FormControl>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select Division" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="dhaka">Dhaka</SelectItem>
+                                <SelectItem value="chittagong">Chittagong</SelectItem>
+                                <SelectItem value="rajshahi">Rajshahi</SelectItem>
+                                <SelectItem value="khulna">Khulna</SelectItem>
+                                <SelectItem value="barisal">Barisal</SelectItem>
+                                <SelectItem value="sylhet">Sylhet</SelectItem>
+                                <SelectItem value="rangpur">Rangpur</SelectItem>
+                                <SelectItem value="mymensingh">Mymensingh</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="shippingLandmark"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Landmark (Optional)</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="e.g., Near City Hospital, Behind main mosque" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="shippingInstructions"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Delivery Instructions (Optional)</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="e.g., Call before delivery, Ring doorbell twice" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
                   <FormField
                     control={form.control}
                     name="shippingPhone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Phone Number (Optional)</FormLabel>
+                        <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                          <Input {...field} type="tel" />
+                          <Input {...field} type="tel" placeholder="01XXXXXXXXX" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -499,17 +578,14 @@ export default function Checkout() {
                             className="grid grid-cols-1 gap-4"
                           >
                             <div className="flex items-center space-x-2 border border-gray-200 rounded-lg p-4">
-                              <RadioGroupItem value="card" id="card" />
-                              <Label htmlFor="card" className="flex-1">Credit/Debit Card</Label>
-                              <div className="flex space-x-2">
-                                <div className="w-8 h-5 bg-blue-600 rounded text-white text-xs flex items-center justify-center">V</div>
-                                <div className="w-8 h-5 bg-red-600 rounded text-white text-xs flex items-center justify-center">M</div>
-                              </div>
+                              <RadioGroupItem value="cash_on_delivery" id="cash_on_delivery" />
+                              <Label htmlFor="cash_on_delivery" className="flex-1">Cash on Delivery</Label>
+                              <div className="w-16 h-5 bg-green-600 rounded text-white text-xs flex items-center justify-center">COD</div>
                             </div>
                             <div className="flex items-center space-x-2 border border-gray-200 rounded-lg p-4">
-                              <RadioGroupItem value="paypal" id="paypal" />
-                              <Label htmlFor="paypal" className="flex-1">PayPal</Label>
-                              <div className="w-16 h-5 bg-blue-500 rounded text-white text-xs flex items-center justify-center">PayPal</div>
+                              <RadioGroupItem value="bkash" id="bkash" />
+                              <Label htmlFor="bkash" className="flex-1">bKash</Label>
+                              <div className="w-16 h-5 bg-pink-600 rounded text-white text-xs flex items-center justify-center">bKash</div>
                             </div>
                           </RadioGroup>
                         </FormControl>
@@ -518,63 +594,36 @@ export default function Checkout() {
                     )}
                   />
                   
-                  {paymentMethod === "card" && (
+                  {paymentMethod === "bkash" && (
                     <div className="mt-6 space-y-4">
                       <FormField
                         control={form.control}
-                        name="cardName"
+                        name="bkashNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Name on Card</FormLabel>
+                            <FormLabel>bKash Account Number</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} placeholder="01XXXXXXXXX" type="tel" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                      
-                      <FormField
-                        control={form.control}
-                        name="cardNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Card Number</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="1234 5678 9012 3456" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="expiryDate"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Expiry Date</FormLabel>
-                              <FormControl>
-                                <Input {...field} placeholder="MM/YY" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="cvv"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>CVV</FormLabel>
-                              <FormControl>
-                                <Input {...field} placeholder="123" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                      <div className="bg-blue-50 p-4 rounded-lg">
+                        <p className="text-sm text-gray-600">
+                          You will receive a payment request on your bKash number after placing the order. 
+                          Please complete the payment to confirm your order.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {paymentMethod === "cash_on_delivery" && (
+                    <div className="mt-6">
+                      <div className="bg-green-50 p-4 rounded-lg">
+                        <p className="text-sm text-gray-600">
+                          Pay in cash when your order is delivered. No advance payment required.
+                        </p>
                       </div>
                     </div>
                   )}
@@ -623,10 +672,7 @@ export default function Checkout() {
                         {shipping === 0 ? "Free" : `৳${shipping.toFixed(2)}`}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Tax</span>
-                      <span className="font-medium">৳{tax.toFixed(2)}</span>
-                    </div>
+
                     <Separator />
                     <div className="flex justify-between">
                       <span className="text-lg font-semibold text-baby-primary">Total</span>
