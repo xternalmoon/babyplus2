@@ -23,6 +23,9 @@ This is a full-stack e-commerce web application specifically designed for baby c
 - Removed Learn More button from landing page per user preference
 - Added reference images field to product schema for customization options
 - Fixed API fetch errors in product creation/update with proper HTTP methods
+- Updated shop filters with comprehensive baby clothing sizes: 0–3M through Size 16
+- Completed Bangladesh localization with all price ranges in Taka currency
+- Implemented comprehensive category filters specific to baby/children clothing market
 
 The application is built as a multi-page application with dedicated pages for shopping, product management, cart functionality, user profiles, and administrative controls.
 

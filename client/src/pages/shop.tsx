@@ -216,13 +216,18 @@ export default function Shop() {
                 <div className="mb-6">
                   <h4 className="font-medium text-baby-primary mb-3">Size</h4>
                   <div className="grid grid-cols-3 gap-2">
-                    {["NB", "3M", "6M", "9M", "12M", "18M"].map((size) => (
+                    {[
+                      "0–3M", "3–6M", "6–9M", "9–12M", "12–18M", 
+                      "2T", "3T", "4T", 
+                      "Size 4", "Size 5", "Size 6", "Size 7", "Size 8", 
+                      "Size 10", "Size 12", "Size 14", "Size 16"
+                    ].map((size) => (
                       <Button
                         key={size}
                         variant={filters.sizes.includes(size) ? "default" : "outline"}
                         size="sm"
                         onClick={() => handleSizeToggle(size)}
-                        className={filters.sizes.includes(size) ? "bg-baby-accent text-white" : ""}
+                        className={filters.sizes.includes(size) ? "bg-baby-accent text-white" : "text-xs"}
                       >
                         {size}
                       </Button>
