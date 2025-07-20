@@ -14,6 +14,8 @@ import Checkout from "@/pages/checkout";
 import Profile from "@/pages/profile";
 import AdminDashboard from "@/pages/admin-dashboard";
 import Landing from "@/pages/landing";
+import Login from "@/pages/login";
+import Signup from "@/pages/signup";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -30,7 +32,11 @@ function Router() {
   return (
     <Switch>
       {!isAuthenticated ? (
-        <Route path="/" component={Landing} />
+        <>
+          <Route path="/" component={Landing} />
+          <Route path="/login" component={Login} />
+          <Route path="/signup" component={Signup} />
+        </>
       ) : (
         <>
           <Route path="/" component={Home} />

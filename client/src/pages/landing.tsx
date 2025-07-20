@@ -23,7 +23,7 @@ export default function Landing() {
             
             <div className="flex items-center space-x-4">
               <Button 
-                onClick={() => window.location.href = "/api/login"}
+                onClick={() => window.location.href = "/login"}
                 className="bg-baby-accent hover:bg-blue-600 text-white"
               >
                 Sign In
@@ -47,7 +47,7 @@ export default function Landing() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button 
-                onClick={() => window.location.href = "/api/login"}
+                onClick={() => window.location.href = "/login"}
                 className="bg-baby-green hover:bg-green-600 text-white px-8 py-4 text-lg h-auto"
               >
                 Start Shopping
@@ -150,7 +150,7 @@ export default function Landing() {
             Join thousands of happy parents who trust Baby Plus for their little ones.
           </p>
           <Button 
-            onClick={() => window.location.href = "/api/login"}
+            onClick={() => window.location.href = "/login"}
             className="bg-baby-green hover:bg-green-600 text-white px-8 py-4 text-lg h-auto"
           >
             Sign In & Shop Now

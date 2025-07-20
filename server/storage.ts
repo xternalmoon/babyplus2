@@ -9,7 +9,7 @@ import {
   wishlists,
   reviews,
   type User,
-  type UpsertUser,
+  type InsertUser,
   type Category,
   type InsertCategory,
   type Product,
@@ -30,9 +30,10 @@ import { db } from "./db";
 import { eq, desc, and, like, gte, lte, inArray, sql } from "drizzle-orm";
 
 export interface IStorage {
-  // User operations (required for Replit Auth)
-  getUser(id: string): Promise<User | undefined>;
-  upsertUser(user: UpsertUser): Promise<User>;
+  // User operations
+  getUser(id: number): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
 
   // Category operations
   getCategories(): Promise<Category[]>;
@@ -59,8 +60,8 @@ export interface IStorage {
   getProductsByCategory(categoryId: number): Promise<Product[]>;
 
   // Cart operations
-  getCart(userId: string): Promise<Cart | undefined>;
-  createCart(userId: string): Promise<Cart>;
+  getCart(userId: number): Promise<Cart | undefined>;
+  createCart(userId: number): Promise<Cart>;
   getCartItems(cartId: number): Promise<(CartItem & { product: Product })[]>;
   addToCart(cartItem: InsertCartItem): Promise<CartItem>;
   updateCartItem(id: number, quantity: number): Promise<CartItem>;
@@ -68,15 +69,15 @@ export interface IStorage {
   clearCart(cartId: number): Promise<void>;
 
   // Order operations
-  getOrders(userId?: string): Promise<(Order & { items: OrderItem[] })[]>;
+  getOrders(userId?: number): Promise<(Order & { items: OrderItem[] })[]>;
   getOrderById(id: number): Promise<(Order & { items: OrderItem[] }) | undefined>;
   createOrder(order: InsertOrder, items: InsertOrderItem[]): Promise<Order>;
   updateOrderStatus(id: number, status: string): Promise<Order>;
 
   // Wishlist operations
-  getWishlist(userId: string): Promise<(Wishlist & { product: Product })[]>;
+  getWishlist(userId: number): Promise<(Wishlist & { product: Product })[]>;
   addToWishlist(wishlist: InsertWishlist): Promise<Wishlist>;
-  removeFromWishlist(userId: string, productId: number): Promise<void>;
+  removeFromWishlist(userId: number, productId: number): Promise<void>;
 
   // Review operations
   getProductReviews(productId: number): Promise<(Review & { user: User })[]>;
@@ -93,23 +94,18 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   // User operations
-  async getUser(id: string): Promise<User | undefined> {
+  async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
 
-  async upsertUser(userData: UpsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(userData: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(userData).returning();
     return user;
   }
 
@@ -233,12 +229,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Cart operations
-  async getCart(userId: string): Promise<Cart | undefined> {
+  async getCart(userId: number): Promise<Cart | undefined> {
     const [cart] = await db.select().from(carts).where(eq(carts.userId, userId));
     return cart;
   }
 
-  async createCart(userId: string): Promise<Cart> {
+  async createCart(userId: number): Promise<Cart> {
     const [cart] = await db.insert(carts).values({ userId }).returning();
     return cart;
   }
@@ -304,7 +300,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Order operations
-  async getOrders(userId?: string): Promise<(Order & { items: OrderItem[] })[]> {
+  async getOrders(userId?: number): Promise<(Order & { items: OrderItem[] })[]> {
     let ordersQuery = db.select().from(orders);
     
     if (userId) {
@@ -364,7 +360,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Wishlist operations
-  async getWishlist(userId: string): Promise<(Wishlist & { product: Product })[]> {
+  async getWishlist(userId: number): Promise<(Wishlist & { product: Product })[]> {
     return await db
       .select()
       .from(wishlists)
@@ -383,7 +379,7 @@ export class DatabaseStorage implements IStorage {
     return newWishlist;
   }
 
-  async removeFromWishlist(userId: string, productId: number): Promise<void> {
+  async removeFromWishlist(userId: number, productId: number): Promise<void> {
     await db
       .delete(wishlists)
       .where(and(eq(wishlists.userId, userId), eq(wishlists.productId, productId)));

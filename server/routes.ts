@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated } from "./auth";
 import { z } from "zod";
 import { insertProductSchema, insertCategorySchema, insertCartItemSchema, insertOrderSchema, insertWishlistSchema, insertReviewSchema } from "@shared/schema";
 
@@ -9,17 +9,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
-  // Auth routes
-  app.get("/api/auth/user", isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
+  // Note: Auth routes are handled in auth.ts
 
   // Public routes
   app.get("/api/categories", async (req, res) => {
@@ -104,7 +94,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Protected customer routes
   app.get("/api/cart", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       let cart = await storage.getCart(userId);
       
       if (!cart) {
@@ -121,7 +111,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/cart/add", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const cartItemData = insertCartItemSchema.parse(req.body);
       
       let cart = await storage.getCart(userId);
@@ -167,7 +157,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/orders", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const orders = await storage.getOrders(userId);
       res.json(orders);
     } catch (error) {
@@ -178,7 +168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/orders", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const orderData = insertOrderSchema.parse(req.body);
       const { items } = req.body;
       
@@ -202,7 +192,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/wishlist", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const wishlist = await storage.getWishlist(userId);
       res.json(wishlist);
     } catch (error) {
@@ -213,7 +203,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/wishlist", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const wishlistData = insertWishlistSchema.parse(req.body);
       
       const wishlistItem = await storage.addToWishlist({
@@ -230,7 +220,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/wishlist/:productId", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const productId = parseInt(req.params.productId);
       
       await storage.removeFromWishlist(userId, productId);
@@ -243,7 +233,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/reviews", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const reviewData = insertReviewSchema.parse(req.body);
       
       const review = await storage.createReview({
@@ -261,7 +251,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin routes
   const requireAdmin = async (req: any, res: any, next: any) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const user = await storage.getUser(userId);
       
       if (!user || user.role !== "admin") {

@@ -25,13 +25,14 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// User storage table (required for Replit Auth)
+// User storage table
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().notNull(),
-  email: varchar("email").unique(),
-  firstName: varchar("first_name"),
-  lastName: varchar("last_name"),
-  profileImageUrl: varchar("profile_image_url"),
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  password: varchar("password", { length: 255 }).notNull(),
+  firstName: varchar("first_name", { length: 100 }),
+  lastName: varchar("last_name", { length: 100 }),
+  profileImageUrl: varchar("profile_image_url", { length: 500 }),
   role: varchar("role").notNull().default("customer"), // customer or admin
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -72,7 +73,7 @@ export const products = pgTable("products", {
 // Cart table
 export const carts = pgTable("carts", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id),
+  userId: integer("user_id").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -92,7 +93,7 @@ export const cartItems = pgTable("cart_items", {
 // Orders table
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id),
+  userId: integer("user_id").references(() => users.id),
   orderNumber: varchar("order_number", { length: 50 }).notNull().unique(),
   status: varchar("status", { length: 50 }).notNull().default("pending"), // pending, processing, shipped, delivered, cancelled
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
@@ -124,7 +125,7 @@ export const orderItems = pgTable("order_items", {
 // Wishlist table
 export const wishlists = pgTable("wishlists", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id),
+  userId: integer("user_id").references(() => users.id),
   productId: integer("product_id").references(() => products.id),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -132,7 +133,7 @@ export const wishlists = pgTable("wishlists", {
 // Reviews table
 export const reviews = pgTable("reviews", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id),
+  userId: integer("user_id").references(() => users.id),
   productId: integer("product_id").references(() => products.id),
   rating: integer("rating").notNull(), // 1-5 stars
   title: varchar("title", { length: 200 }),
@@ -226,13 +227,22 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
 }));
 
 // Insert schemas
-export const insertUserSchema = createInsertSchema(users).pick({
+export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
-  email: true,
-  firstName: true,
-  lastName: true,
-  profileImageUrl: true,
-  role: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+export const signupSchema = insertUserSchema.extend({
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
 export const insertCategorySchema = createInsertSchema(categories).omit({
@@ -274,8 +284,10 @@ export const insertReviewSchema = createInsertSchema(reviews).omit({
 });
 
 // Types
-export type UpsertUser = z.infer<typeof insertUserSchema>;
+export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+export type LoginData = z.infer<typeof loginSchema>;
+export type SignupData = z.infer<typeof signupSchema>;
 export type Category = typeof categories.$inferSelect;
 export type InsertCategory = z.infer<typeof insertCategorySchema>;
 export type Product = typeof products.$inferSelect;
