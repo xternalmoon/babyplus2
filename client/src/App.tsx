@@ -54,7 +54,7 @@ function AppContent() {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-baby-secondary">
+      <div className="min-h-screen bg-baby-secondary text-baby-dark">
         {!isLoading && isAuthenticated && <Header />}
         <Router />
         {!isLoading && isAuthenticated && <Footer />}

@@ -24,11 +24,13 @@
   --ring: hsl(215, 20%, 65%);
   --radius: 0.5rem;
   
-  /* Baby Plus custom colors */
-  --baby-primary: hsl(222, 84%, 5%);
-  --baby-secondary: hsl(210, 40%, 96%);
-  --baby-accent: hsl(217, 91%, 60%);
-  --baby-green: hsl(158, 64%, 52%);
+  /* Baby Plus custom colors - soft pastels with good contrast */
+  --baby-primary: hsl(195, 100%, 85%); /* Soft baby blue */
+  --baby-secondary: hsl(345, 100%, 95%); /* Very light pink */
+  --baby-accent: hsl(50, 100%, 88%); /* Soft yellow */
+  --baby-green: hsl(140, 40%, 85%); /* Soft mint green */
+  --baby-text-dark: hsl(220, 20%, 20%); /* Dark text for readability */
+  --baby-text-light: hsl(0, 0%, 100%); /* White text */
 }
 
 .dark {
@@ -64,22 +66,28 @@
 }
 
 @layer utilities {
+  /* Baby themed utility classes with proper contrast */
   .baby-primary {
-    @apply bg-baby-primary text-white;
+    background-color: var(--baby-primary);
+    color: var(--baby-text-dark);
   }
   
   .baby-secondary {
-    @apply bg-baby-secondary text-baby-primary;
+    background-color: var(--baby-secondary);
+    color: var(--baby-text-dark);
   }
   
   .baby-accent {
-    @apply bg-baby-accent text-white;
+    background-color: var(--baby-accent);
+    color: var(--baby-text-dark);
   }
   
   .baby-green {
-    @apply bg-baby-green text-white;
+    background-color: var(--baby-green);
+    color: var(--baby-text-dark);
   }
   
+  /* Text color utilities */
   .text-baby-primary {
     color: var(--baby-primary);
   }
@@ -92,6 +100,15 @@
     color: var(--baby-green);
   }
   
+  .text-baby-dark {
+    color: var(--baby-text-dark);
+  }
+  
+  .text-baby-light {
+    color: var(--baby-text-light);
+  }
+  
+  /* Background color utilities */
   .bg-baby-primary {
     background-color: var(--baby-primary);
   }
@@ -108,12 +125,24 @@
     background-color: var(--baby-green);
   }
   
+  /* Border utilities */
+  .border-baby-primary {
+    border-color: var(--baby-primary);
+  }
+  
   .border-baby-accent {
     border-color: var(--baby-accent);
   }
   
+  /* Hover states with proper contrast */
+  .hover\:bg-baby-primary:hover {
+    background-color: var(--baby-primary);
+    color: var(--baby-text-dark);
+  }
+  
   .hover\:bg-baby-accent:hover {
     background-color: var(--baby-accent);
+    color: var(--baby-text-dark);
   }
   
   .hover\:text-baby-accent:hover {
@@ -122,5 +151,18 @@
   
   .focus\:ring-baby-accent:focus {
     --tw-ring-color: var(--baby-accent);
+  }
+  
+  /* Button specific styles */
+  .btn-baby-primary {
+    background-color: var(--baby-primary);
+    color: var(--baby-text-dark);
+    border: 2px solid var(--baby-primary);
+  }
+  
+  .btn-baby-primary:hover {
+    background-color: var(--baby-accent);
+    border-color: var(--baby-accent);
+    color: var(--baby-text-dark);
   }
 }
