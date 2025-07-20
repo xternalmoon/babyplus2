@@ -10,6 +10,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
   // Note: Auth routes are handled in auth.ts
+  
+  // Admin request route for users to request admin access
+  app.post("/api/auth/request-admin", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (user.role === "admin") {
+        return res.status(400).json({ message: "User is already an admin" });
+      }
+      
+      // For demo purposes, automatically grant admin access
+      // In production, this would create a request for review
+      const updatedUser = await storage.updateUserRole(userId, "admin");
+      
+      res.json({ 
+        message: "Admin access granted! You can now access the admin dashboard.",
+        user: updatedUser 
+      });
+    } catch (error) {
+      console.error("Error requesting admin access:", error);
+      res.status(500).json({ message: "Failed to process admin request" });
+    }
+  });
 
   // Public routes
   app.get("/api/categories", async (req, res) => {

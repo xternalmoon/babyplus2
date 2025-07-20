@@ -2,7 +2,16 @@
 
 ## Overview
 
-This is a full-stack e-commerce web application specifically designed for baby clothing retail. The application provides distinct experiences for customers and administrators, featuring a modern React frontend with Express backend, PostgreSQL database with Drizzle ORM, and Replit authentication.
+This is a full-stack e-commerce web application specifically designed for baby clothing retail. The application provides distinct experiences for customers and administrators, featuring a modern React frontend with Express backend, PostgreSQL database with Drizzle ORM, and email/password authentication.
+
+**Recent Changes (July 20, 2025):**
+- Successfully migrated from Replit OAuth to traditional email/password authentication
+- Implemented bcrypt password hashing with session-based authentication
+- Updated database schema with integer user IDs and password fields
+- Built comprehensive login and signup pages with form validation
+- Updated all API routes to use session authentication instead of OAuth tokens
+- Added admin request system allowing users to request admin access from their profile
+- Created sample categories and products for testing the admin functionality
 
 The application is built as a multi-page application with dedicated pages for shopping, product management, cart functionality, user profiles, and administrative controls.
 
@@ -29,10 +38,11 @@ UI Preferences: Learn more and logout buttons should have black text by default,
 - **Session Management**: Express sessions with PostgreSQL storage
 
 ### Authentication System
-- **Provider**: Replit OAuth/OpenID Connect integration
+- **Provider**: Traditional email/password authentication with bcrypt hashing
 - **Session Storage**: PostgreSQL-backed sessions using connect-pg-simple
 - **Authorization**: Role-based access control (customer/admin roles)
-- **Security**: HTTP-only cookies, secure session configuration
+- **Security**: HTTP-only cookies, secure session configuration, salted password hashing
+- **Admin Access**: Users can request admin access through their profile page (automatically granted for demo purposes)
 
 ## Key Components
 

@@ -1,19 +1,50 @@
-import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Package, Heart, Settings, LogOut } from "lucide-react";
+import { User, Package, Heart, Settings, LogOut, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import { apiRequest } from "@/lib/queryClient";
 import type { OrderWithItems, WishlistWithProduct } from "@/types";
 
 export default function Profile() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [isRequestingAdmin, setIsRequestingAdmin] = useState(false);
+
+  const requestAdminMutation = useMutation({
+    mutationFn: () => apiRequest('/api/auth/request-admin', {
+      method: 'POST',
+    }),
+    onSuccess: (data) => {
+      toast({
+        title: "Success!",
+        description: data.message,
+      });
+      // Refresh user data
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      setIsRequestingAdmin(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Request Failed",
+        description: error.message || "Failed to request admin access",
+        variant: "destructive",
+      });
+      setIsRequestingAdmin(false);
+    },
+  });
+
+  const handleRequestAdmin = () => {
+    setIsRequestingAdmin(true);
+    requestAdminMutation.mutate();
+  };
 
   const { data: orders, isLoading: ordersLoading, error: ordersError } = useQuery<OrderWithItems[]>({
     queryKey: ["/api/orders"],
@@ -316,10 +347,23 @@ export default function Profile() {
                       {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Unknown"}
                     </p>
                   </div>
-                  <Button variant="outline" className="w-full border-baby-accent text-baby-accent hover:bg-baby-accent hover:text-white">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Edit Profile
-                  </Button>
+                  <div className="space-y-3">
+                    <Button variant="outline" className="w-full border-baby-accent text-baby-accent hover:bg-baby-accent hover:text-white">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Edit Profile
+                    </Button>
+                    {user.role !== "admin" && (
+                      <Button 
+                        onClick={handleRequestAdmin}
+                        disabled={isRequestingAdmin || requestAdminMutation.isPending}
+                        variant="outline" 
+                        className="w-full text-black border-gray-300 hover:bg-baby-green hover:text-white hover:border-baby-green transition-all duration-200"
+                      >
+                        <Shield className="w-4 h-4 mr-2" />
+                        {isRequestingAdmin || requestAdminMutation.isPending ? "Processing..." : "Request Admin Access"}
+                      </Button>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
 
