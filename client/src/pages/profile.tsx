@@ -123,7 +123,8 @@ export default function Profile() {
             <Button 
               onClick={() => window.location.href = "/api/logout"}
               variant="outline"
-              className="border-white text-white hover:bg-white hover:text-baby-primary"
+              className="border-white text-black hover:bg-white hover:text-baby-primary"
+              style={{ color: 'black' }}
             >
               <LogOut className="w-4 h-4 mr-2" />
               Logout

@@ -55,6 +55,7 @@ export default function Landing() {
               <Button 
                 variant="outline"
                 className="border-2 border-white text-black bg-white hover:bg-baby-green hover:text-white hover:border-baby-green px-8 py-4 text-lg h-auto transition-all duration-200"
+                style={{ color: 'black' }}
               >
                 Learn More
               </Button>

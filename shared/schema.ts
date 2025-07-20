@@ -61,6 +61,7 @@ export const products = pgTable("products", {
   colors: text("colors").array().notNull(), // available colors
   imageUrl: varchar("image_url", { length: 500 }),
   imageUrls: text("image_urls").array(), // multiple product images
+  referenceImages: text("reference_images").array(), // reference/inspiration images
   stock: integer("stock").notNull().default(0),
   isActive: boolean("is_active").notNull().default(true),
   isFeatured: boolean("is_featured").notNull().default(false),

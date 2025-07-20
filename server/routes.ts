@@ -336,6 +336,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update product
+  app.put("/api/admin/products/:id", isAuthenticated, requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const productData = insertProductSchema.parse(req.body);
+      const product = await storage.updateProduct(id, productData);
+      res.json(product);
+    } catch (error) {
+      console.error("Error updating product:", error);
+      res.status(400).json({ message: "Failed to update product" });
+    }
+  });
+
   app.patch("/api/admin/products/:id", isAuthenticated, requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);

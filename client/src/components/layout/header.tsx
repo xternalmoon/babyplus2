@@ -156,6 +156,7 @@ export default function Header() {
                   onClick={() => window.location.href = "/api/logout"}
                   variant="outline"
                   className="w-full text-black border-gray-300 hover:bg-baby-green hover:text-white hover:border-baby-green transition-all duration-200"
+                  style={{ color: 'black' }}
                 >
                   Logout
                 </Button>

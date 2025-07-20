@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   DollarSign, 
   Package, 
@@ -20,14 +24,28 @@ import {
   Trash2, 
   Eye,
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  Palette,
+  Image as ImageIcon
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
 import type { AdminStats, OrderWithItems } from "@/types";
-import type { Product } from "@shared/schema";
+import type { Product, InsertProduct } from "@shared/schema";
+import { insertProductSchema } from "@shared/schema";
+import { z } from "zod";
+
+// Enhanced product schema with customization options
+const enhancedProductSchema = insertProductSchema.extend({
+  colors: z.array(z.string()).min(1, "At least one color is required"),
+  sizes: z.array(z.string()).min(1, "At least one size is required"),
+  imageUrl: z.string().url("Must be a valid URL").optional(),
+  referenceImages: z.array(z.string().url()).optional(),
+});
+
+type EnhancedProductForm = z.infer<typeof enhancedProductSchema>;
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -36,6 +54,124 @@ export default function AdminDashboard() {
   const [selectedOrder, setSelectedOrder] = useState<OrderWithItems | null>(null);
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  // Product form with validation
+  const form = useForm<EnhancedProductForm>({
+    resolver: zodResolver(enhancedProductSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      price: "",
+      categoryId: 1,
+      stock: 0,
+      sku: "",
+      colors: [],
+      sizes: [],
+      ageGroup: "",
+      isActive: true,
+      isFeatured: false,
+      imageUrl: "",
+      referenceImages: [],
+    },
+  });
+
+  // Create product mutation
+  const createProductMutation = useMutation({
+    mutationFn: (data: EnhancedProductForm) =>
+      apiRequest("/api/admin/products", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => {
+      toast({
+        title: "Success!",
+        description: "Product created successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+      setIsProductDialogOpen(false);
+      form.reset();
+      setEditingProduct(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create product",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update product mutation
+  const updateProductMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: EnhancedProductForm }) =>
+      apiRequest(`/api/admin/products/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => {
+      toast({
+        title: "Success!",
+        description: "Product updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+      setIsProductDialogOpen(false);
+      form.reset();
+      setEditingProduct(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update product",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Submit handler
+  const onSubmit = (data: EnhancedProductForm) => {
+    if (editingProduct) {
+      updateProductMutation.mutate({ id: editingProduct.id, data });
+    } else {
+      createProductMutation.mutate(data);
+    }
+  };
+
+  // Pre-populate form when editing
+  useEffect(() => {
+    if (editingProduct) {
+      form.reset({
+        name: editingProduct.name,
+        description: editingProduct.description || "",
+        price: editingProduct.price.toString(),
+        categoryId: editingProduct.categoryId,
+        stock: editingProduct.stock,
+        sku: editingProduct.sku,
+        colors: editingProduct.colors || [],
+        sizes: editingProduct.sizes || [],
+        ageGroup: editingProduct.ageGroup,
+        isActive: editingProduct.isActive,
+        isFeatured: editingProduct.isFeatured,
+        imageUrl: editingProduct.imageUrl || "",
+        referenceImages: editingProduct.referenceImages || [],
+      });
+    } else {
+      form.reset({
+        name: "",
+        description: "",
+        price: "",
+        categoryId: 1,
+        stock: 0,
+        sku: "",
+        colors: [],
+        sizes: [],
+        ageGroup: "",
+        isActive: true,
+        isFeatured: false,
+        imageUrl: "",
+        referenceImages: [],
+      });
+    }
+  }, [editingProduct, form]);
 
   const { data: stats, isLoading: statsLoading, error: statsError } = useQuery<AdminStats>({
     queryKey: ["/api/admin/stats"],
@@ -185,7 +321,8 @@ export default function AdminDashboard() {
             </div>
             <Button 
               onClick={() => window.location.href = "/api/logout"}
-              className="bg-baby-accent hover:bg-blue-600"
+              className="bg-baby-accent hover:bg-blue-600 text-black"
+              style={{ color: 'black' }}
             >
               Logout
             </Button>
@@ -301,37 +438,188 @@ export default function AdminDashboard() {
                           {editingProduct ? "Update product information" : "Create a new product for your store"}
                         </DialogDescription>
                       </DialogHeader>
-                      <div className="grid grid-cols-2 gap-4 py-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="name">Product Name</Label>
-                          <Input id="name" placeholder="Enter product name" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="price">Price</Label>
-                          <Input id="price" type="number" placeholder="0.00" />
-                        </div>
-                        <div className="col-span-2 space-y-2">
-                          <Label htmlFor="description">Description</Label>
-                          <Textarea id="description" placeholder="Product description" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="ageGroup">Age Group</Label>
-                          <Select>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select age group" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="0-6-months">0-6 Months</SelectItem>
-                              <SelectItem value="6-12-months">6-12 Months</SelectItem>
-                              <SelectItem value="12-24-months">12-24 Months</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="stock">Stock</Label>
-                          <Input id="stock" type="number" placeholder="0" />
-                        </div>
-                      </div>
+                      <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={form.control}
+                              name="name"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Product Name</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="Enter product name" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="price"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Price</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+
+                          <FormField
+                            control={form.control}
+                            name="description"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Description</FormLabel>
+                                <FormControl>
+                                  <Textarea placeholder="Product description" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={form.control}
+                              name="ageGroup"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Age Group</FormLabel>
+                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select age group" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="0-6M">0-6 Months</SelectItem>
+                                      <SelectItem value="6-12M">6-12 Months</SelectItem>
+                                      <SelectItem value="12-24M">12-24 Months</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="stock"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Stock Quantity</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" placeholder="0" {...field} onChange={(e) => field.onChange(parseInt(e.target.value) || 0)} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+
+                          <FormField
+                            control={form.control}
+                            name="sku"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>SKU (Product Code)</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="e.g. ORG-001" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="imageUrl"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Main Product Image URL</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="https://example.com/image.jpg" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={form.control}
+                              name="colors"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Available Colors (comma-separated)</FormLabel>
+                                  <FormControl>
+                                    <Input 
+                                      placeholder="White, Pink, Blue, Yellow" 
+                                      value={field.value.join(", ")}
+                                      onChange={(e) => field.onChange(e.target.value.split(",").map(s => s.trim()).filter(s => s))}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="sizes"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Available Sizes (comma-separated)</FormLabel>
+                                  <FormControl>
+                                    <Input 
+                                      placeholder="0-3M, 3-6M, 6-9M, 9-12M" 
+                                      value={field.value.join(", ")}
+                                      onChange={(e) => field.onChange(e.target.value.split(",").map(s => s.trim()).filter(s => s))}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+
+                          <div className="flex items-center space-x-4">
+                            <FormField
+                              control={form.control}
+                              name="isActive"
+                              render={({ field }) => (
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value}
+                                      onCheckedChange={field.onChange}
+                                    />
+                                  </FormControl>
+                                  <FormLabel>Product is Active</FormLabel>
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="isFeatured"
+                              render={({ field }) => (
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value}
+                                      onCheckedChange={field.onChange}
+                                    />
+                                  </FormControl>
+                                  <FormLabel>Featured Product</FormLabel>
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        </form>
+                      </Form>
                       <div className="flex justify-end space-x-2">
                         <Button variant="outline" onClick={() => {
                           setIsProductDialogOpen(false);
@@ -339,8 +627,18 @@ export default function AdminDashboard() {
                         }}>
                           Cancel
                         </Button>
-                        <Button className="bg-baby-accent hover:bg-blue-600 text-white">
-                          {editingProduct ? "Update" : "Create"} Product
+                        <Button 
+                          type="submit"
+                          className="bg-baby-accent hover:bg-blue-600 text-white"
+                          disabled={createProductMutation.isPending || updateProductMutation.isPending}
+                          onClick={form.handleSubmit(onSubmit)}
+                        >
+                          {createProductMutation.isPending || updateProductMutation.isPending 
+                            ? "Publishing..." 
+                            : editingProduct 
+                              ? "Update Product" 
+                              : "Publish Product"
+                          }
                         </Button>
                       </div>
                     </DialogContent>
