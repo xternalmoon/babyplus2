@@ -581,6 +581,59 @@ export default function AdminDashboard() {
                             )}
                           />
 
+                          <FormField
+                            control={form.control}
+                            name="referenceImages"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Reference Images (Optional)</FormLabel>
+                                <div className="space-y-2">
+                                  {field.value?.map((url, index) => (
+                                    <div key={index} className="flex gap-2">
+                                      <Input
+                                        value={url}
+                                        onChange={(e) => {
+                                          const newImages = [...(field.value || [])];
+                                          newImages[index] = e.target.value;
+                                          field.onChange(newImages);
+                                        }}
+                                        placeholder="https://example.com/reference-image.jpg"
+                                        className="flex-1"
+                                      />
+                                      <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => {
+                                          const newImages = field.value?.filter((_, i) => i !== index) || [];
+                                          field.onChange(newImages);
+                                        }}
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </Button>
+                                    </div>
+                                  ))}
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      field.onChange([...(field.value || []), ""]);
+                                    }}
+                                    className="w-full"
+                                  >
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    Add Reference Image
+                                  </Button>
+                                </div>
+                                <p className="text-sm text-gray-500">
+                                  Add multiple reference or inspiration images for this product
+                                </p>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
                           <div className="grid grid-cols-2 gap-4">
                             <FormField
                               control={form.control}
