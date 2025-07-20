@@ -6,7 +6,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen">
       {/* Announcement Bar */}
-      <div className="bg-baby-green text-white text-center py-2 text-sm">
+      <div className="bg-cyan-500 text-white text-center py-2 text-sm">
         <p>Free shipping on orders over ৳5000 • 30-day returns • Organic cotton guarantee</p>
       </div>
 
