@@ -22,7 +22,7 @@ export default function Header() {
     <>
       {/* Announcement Bar */}
       <div className="bg-baby-green text-white text-center py-2 text-sm">
-        <p>Free shipping on orders over $50 • 30-day returns • Organic cotton guarantee</p>
+        <p>Free shipping on orders over ৳5000 • 30-day returns • Organic cotton guarantee</p>
       </div>
 
       {/* Main Navigation */}
@@ -153,7 +153,15 @@ export default function Header() {
               )}
               <div className="pt-2 border-t border-gray-200">
                 <Button 
-                  onClick={() => window.location.href = "/api/logout"}
+                  onClick={async () => {
+                    const response = await fetch("/api/auth/logout", {
+                      method: "POST",
+                      credentials: "include"
+                    });
+                    if (response.ok) {
+                      window.location.href = "/";
+                    }
+                  }}
                   variant="outline"
                   className="w-full text-black border-gray-300 hover:bg-baby-green hover:text-white hover:border-baby-green transition-all duration-200"
                   style={{ color: 'black' }}

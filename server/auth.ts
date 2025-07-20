@@ -78,7 +78,7 @@ export async function setupAuth(app: Express) {
         password: hashedPassword,
         firstName: validatedData.firstName,
         lastName: validatedData.lastName,
-        role: validatedData.role || "customer",
+        role: "customer", // Always default to customer, admin access must be granted manually
       });
 
       // Store user in session

@@ -134,9 +134,9 @@ export default function ProductCard({ product }: ProductCardProps) {
           <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <span className="text-lg font-bold text-baby-primary">${product.price}</span>
+              <span className="text-lg font-bold text-baby-primary">৳{product.price}</span>
               {product.originalPrice && (
-                <span className="text-sm text-gray-500 line-through">${product.originalPrice}</span>
+                <span className="text-sm text-gray-500 line-through">৳{product.originalPrice}</span>
               )}
             </div>
             <div className="flex items-center text-yellow-400">

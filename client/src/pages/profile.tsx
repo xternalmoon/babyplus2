@@ -121,7 +121,15 @@ export default function Profile() {
               </div>
             </div>
             <Button 
-              onClick={() => window.location.href = "/api/logout"}
+              onClick={async () => {
+                const response = await fetch("/api/auth/logout", {
+                  method: "POST",
+                  credentials: "include"
+                });
+                if (response.ok) {
+                  window.location.href = "/";
+                }
+              }}
               variant="outline"
               className="border-white text-black hover:bg-white hover:text-baby-primary"
               style={{ color: 'black' }}

@@ -344,7 +344,15 @@ export default function AdminDashboard() {
               <p className="text-gray-300">Baby Plus Store Management</p>
             </div>
             <Button 
-              onClick={() => window.location.href = "/api/logout"}
+              onClick={async () => {
+                const response = await fetch("/api/auth/logout", {
+                  method: "POST",
+                  credentials: "include"
+                });
+                if (response.ok) {
+                  window.location.href = "/";
+                }
+              }}
               className="bg-baby-accent hover:bg-blue-600 text-black"
               style={{ color: 'black' }}
             >
@@ -367,7 +375,7 @@ export default function AdminDashboard() {
                 <div className="ml-4">
                   <h3 className="text-sm font-medium text-gray-600">Total Revenue</h3>
                   <p className="text-2xl font-bold text-baby-primary">
-                    ${statsLoading ? "..." : stats?.totalRevenue.toFixed(2) || "0.00"}
+                    ৳{statsLoading ? "..." : stats?.totalRevenue.toFixed(2) || "0.00"}
                   </p>
                 </div>
               </div>
@@ -757,7 +765,7 @@ export default function AdminDashboard() {
                             </div>
                           </TableCell>
                           <TableCell>{product.ageGroup.replace("-", "-").replace("months", " Months")}</TableCell>
-                          <TableCell>${product.price}</TableCell>
+                          <TableCell>৳{product.price}</TableCell>
                           <TableCell>{product.stock}</TableCell>
                           <TableCell>
                             <Badge className={product.isActive ? "bg-baby-green text-white" : "bg-gray-500 text-white"}>
