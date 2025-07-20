@@ -9,6 +9,7 @@ The application is built as a multi-page application with dedicated pages for sh
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+UI Preferences: Learn more and logout buttons should have black text by default, with green hover states for better visibility.
 
 ## System Architecture
 
