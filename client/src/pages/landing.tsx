@@ -34,7 +34,7 @@ export default function Landing() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-baby-primary to-baby-accent text-white">
+      <section className="relative text-white" style={{ backgroundColor: '#142e15' }}>
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="max-w-3xl">

@@ -5,7 +5,12 @@
 This is a full-stack e-commerce web application specifically designed for baby clothing retail. The application provides distinct experiences for customers and administrators, featuring a modern React frontend with Express backend, PostgreSQL database with Drizzle ORM, and email/password authentication.
 
 **Recent Changes (July 20, 2025):**
-- Successfully migrated from Replit OAuth to traditional email/password authentication
+- Successfully migrated project from Replit Agent to standard Replit environment
+- Set up PostgreSQL database with complete schema migration using Drizzle
+- All dependencies installed and configured for Replit compatibility
+- Project now runs cleanly with proper database connectivity
+- Updated hero section background color to custom green (#142e15) as requested
+- Previously migrated from Replit OAuth to traditional email/password authentication
 - Implemented bcrypt password hashing with session-based authentication
 - Updated database schema with integer user IDs and password fields
 - Built comprehensive login and signup pages with form validation
