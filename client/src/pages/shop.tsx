@@ -39,7 +39,16 @@ export default function Shop() {
     const params = new URLSearchParams();
     
     if (filters.search) params.append("search", filters.search);
-    if (filters.ageGroup.length > 0) params.append("ageGroup", filters.ageGroup[0]);
+    if (filters.ageGroup.length > 0) {
+      filters.ageGroup.forEach(age => params.append("ageGroup", age));
+    }
+    if (filters.category.length > 0) {
+      filters.category.forEach(cat => params.append("category", cat));
+    }
+    if (filters.priceRange) params.append("priceRange", filters.priceRange);
+    if (filters.sizes.length > 0) {
+      filters.sizes.forEach(size => params.append("sizes", size));
+    }
     if (filters.sortBy !== "featured") params.append("sort", filters.sortBy);
     
     params.append("limit", itemsPerPage.toString());
@@ -122,7 +131,7 @@ export default function Shop() {
                 <div className="mb-6">
                   <h4 className="font-medium text-baby-primary mb-3">Age Group</h4>
                   <div className="space-y-2">
-                    {["0-6-months", "6-12-months", "12-24-months"].map((age) => (
+                    {["0day-1year", "1-3year", "3-5year", "5-10year", "10-15year"].map((age) => (
                       <div key={age} className="flex items-center space-x-2">
                         <Checkbox
                           id={age}
@@ -136,7 +145,11 @@ export default function Shop() {
                           }}
                         />
                         <Label htmlFor={age} className="text-gray-700">
-                          {age.replace("-", "-").replace("months", " Months")}
+                          {age.replace("0day-1year", "0 Day - 1 Year")
+                              .replace("1-3year", "1-3 Years")
+                              .replace("3-5year", "3-5 Years")
+                              .replace("5-10year", "5-10 Years")
+                              .replace("10-15year", "10-15 Years")}
                         </Label>
                       </div>
                     ))}
@@ -147,7 +160,17 @@ export default function Shop() {
                 <div className="mb-6">
                   <h4 className="font-medium text-baby-primary mb-3">Category</h4>
                   <div className="space-y-2">
-                    {["Onesies", "Sleepers", "Outerwear", "Accessories"].map((category) => (
+                    {[
+                      "Onesies", 
+                      "Tops & T-Shirts", 
+                      "Dresses & Rompers", 
+                      "Pants & Leggings", 
+                      "Jackets & Outerwear", 
+                      "Sleepwear & Pajamas", 
+                      "Sweaters & Hoodies", 
+                      "Sets & Outfits", 
+                      "Shoes"
+                    ].map((category) => (
                       <div key={category} className="flex items-center space-x-2">
                         <Checkbox
                           id={category}
@@ -171,16 +194,20 @@ export default function Shop() {
                   <h4 className="font-medium text-baby-primary mb-3">Price Range</h4>
                   <RadioGroup value={filters.priceRange} onValueChange={(value) => handleFilterChange("priceRange", value)}>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="0-25" id="price1" />
-                      <Label htmlFor="price1" className="text-gray-700">$0 - $25</Label>
+                      <RadioGroupItem value="0-1000" id="price1" />
+                      <Label htmlFor="price1" className="text-gray-700">৳0 - ৳1,000</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="25-50" id="price2" />
-                      <Label htmlFor="price2" className="text-gray-700">$25 - $50</Label>
+                      <RadioGroupItem value="1000-2000" id="price2" />
+                      <Label htmlFor="price2" className="text-gray-700">৳1,000 - ৳2,000</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="50-plus" id="price3" />
-                      <Label htmlFor="price3" className="text-gray-700">$50+</Label>
+                      <RadioGroupItem value="2000-5000" id="price3" />
+                      <Label htmlFor="price3" className="text-gray-700">৳2,000 - ৳5,000</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="5000-plus" id="price4" />
+                      <Label htmlFor="price4" className="text-gray-700">৳5,000+</Label>
                     </div>
                   </RadioGroup>
                 </div>

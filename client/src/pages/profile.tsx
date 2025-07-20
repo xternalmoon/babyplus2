@@ -191,7 +191,7 @@ export default function Profile() {
                               {formatStatus(order.status)}
                             </Badge>
                             <p className="text-lg font-bold text-baby-primary mt-1">
-                              ${order.total}
+                              ৳{order.total}
                             </p>
                           </div>
                         </div>
@@ -209,7 +209,7 @@ export default function Profile() {
                                 <p className="text-sm text-gray-600">
                                   {item.size} • {item.color} • Qty: {item.quantity}
                                 </p>
-                                <p className="text-sm font-medium">${item.total}</p>
+                                <p className="text-sm font-medium">৳{item.total}</p>
                               </div>
                             </div>
                           ))}
@@ -290,9 +290,9 @@ export default function Profile() {
                         <p className="text-gray-600 text-sm mb-3 line-clamp-2">{item.product.description}</p>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
-                            <span className="text-lg font-bold text-baby-primary">${item.product.price}</span>
+                            <span className="text-lg font-bold text-baby-primary">৳{item.product.price}</span>
                             {item.product.originalPrice && (
-                              <span className="text-sm text-gray-500 line-through">${item.product.originalPrice}</span>
+                              <span className="text-sm text-gray-500 line-through">৳{item.product.originalPrice}</span>
                             )}
                           </div>
                           <div className="flex items-center text-yellow-400">

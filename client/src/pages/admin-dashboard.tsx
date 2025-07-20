@@ -887,7 +887,7 @@ export default function AdminDashboard() {
                           </TableCell>
                           <TableCell>{order.shippingAddress.firstName} {order.shippingAddress.lastName}</TableCell>
                           <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
-                          <TableCell>${order.total}</TableCell>
+                          <TableCell>৳{order.total}</TableCell>
                           <TableCell>
                             <Select
                               value={order.status}
@@ -953,7 +953,7 @@ export default function AdminDashboard() {
                                               {item.size} • {item.color} • Qty: {item.quantity}
                                             </p>
                                           </div>
-                                          <p className="font-medium">${item.total}</p>
+                                          <p className="font-medium">৳{item.total}</p>
                                         </div>
                                       ))}
                                     </div>
@@ -981,7 +981,7 @@ export default function AdminDashboard() {
                         <div className="flex justify-between items-center">
                           <span className="text-gray-600">This Month</span>
                           <span className="text-2xl font-bold text-baby-primary">
-                            ${stats?.totalRevenue.toFixed(2) || "0.00"}
+                            ৳{stats?.totalRevenue.toFixed(2) || "0.00"}
                           </span>
                         </div>
                         <div className="flex justify-between items-center">
@@ -993,7 +993,7 @@ export default function AdminDashboard() {
                         <div className="flex justify-between items-center">
                           <span className="text-gray-600">Average Order Value</span>
                           <span className="text-2xl font-bold text-baby-primary">
-                            ${stats && stats.totalOrders > 0 ? (stats.totalRevenue / stats.totalOrders).toFixed(2) : "0.00"}
+                            ৳{stats && stats.totalOrders > 0 ? (stats.totalRevenue / stats.totalOrders).toFixed(2) : "0.00"}
                           </span>
                         </div>
                       </div>
