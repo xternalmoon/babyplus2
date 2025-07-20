@@ -10,6 +10,7 @@ This is a full-stack e-commerce web application specifically designed for baby c
 - All dependencies installed and configured for Replit compatibility
 - Project now runs cleanly with proper database connectivity
 - Updated hero section background color to custom green (#142e15) as requested
+- Changed Learn More button to black text on white background with green hover state
 - Previously migrated from Replit OAuth to traditional email/password authentication
 - Implemented bcrypt password hashing with session-based authentication
 - Updated database schema with integer user IDs and password fields

@@ -33,7 +33,7 @@ export default function Home() {
               </Link>
               <Button 
                 variant="outline"
-                className="border-2 border-white text-white hover:bg-white hover:text-baby-primary px-8 py-4 text-lg h-auto"
+                className="border-2 border-white text-black bg-white hover:bg-baby-green hover:text-white px-8 py-4 text-lg h-auto"
               >
                 Learn More
               </Button>
