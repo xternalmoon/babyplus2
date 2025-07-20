@@ -12,6 +12,11 @@ This is a full-stack e-commerce web application specifically designed for baby c
 - Updated all API routes to use session authentication instead of OAuth tokens
 - Added admin request system allowing users to request admin access from their profile
 - Created sample categories and products for testing the admin functionality
+- Fixed admin dashboard publishing functionality with proper form validation
+- Changed Available Colors and Sizes to dropdown selectors with badge display
+- Removed Learn More button from landing page per user preference
+- Added reference images field to product schema for customization options
+- Fixed API fetch errors in product creation/update with proper HTTP methods
 
 The application is built as a multi-page application with dedicated pages for shopping, product management, cart functionality, user profiles, and administrative controls.
 

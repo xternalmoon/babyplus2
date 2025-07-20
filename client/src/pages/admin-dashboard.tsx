@@ -41,8 +41,8 @@ import { z } from "zod";
 const enhancedProductSchema = insertProductSchema.extend({
   colors: z.array(z.string()).min(1, "At least one color is required"),
   sizes: z.array(z.string()).min(1, "At least one size is required"),
-  imageUrl: z.string().url("Must be a valid URL").optional(),
-  referenceImages: z.array(z.string().url()).optional(),
+  imageUrl: z.string().min(1, "Image URL is required"),
+  referenceImages: z.array(z.string()).optional(),
 });
 
 type EnhancedProductForm = z.infer<typeof enhancedProductSchema>;
@@ -77,11 +77,23 @@ export default function AdminDashboard() {
 
   // Create product mutation
   const createProductMutation = useMutation({
-    mutationFn: (data: EnhancedProductForm) =>
-      apiRequest("/api/admin/products", {
+    mutationFn: async (data: EnhancedProductForm) => {
+      const response = await fetch("/api/admin/products", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(data),
-      }),
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to create product");
+      }
+      
+      return response.json();
+    },
     onSuccess: () => {
       toast({
         title: "Success!",
@@ -103,11 +115,23 @@ export default function AdminDashboard() {
 
   // Update product mutation
   const updateProductMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: EnhancedProductForm }) =>
-      apiRequest(`/api/admin/products/${id}`, {
+    mutationFn: async ({ id, data }: { id: number; data: EnhancedProductForm }) => {
+      const response = await fetch(`/api/admin/products/${id}`, {
         method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(data),
-      }),
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update product");
+      }
+      
+      return response.json();
+    },
     onSuccess: () => {
       toast({
         title: "Success!",
@@ -555,14 +579,42 @@ export default function AdminDashboard() {
                               name="colors"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Available Colors (comma-separated)</FormLabel>
-                                  <FormControl>
-                                    <Input 
-                                      placeholder="White, Pink, Blue, Yellow" 
-                                      value={field.value.join(", ")}
-                                      onChange={(e) => field.onChange(e.target.value.split(",").map(s => s.trim()).filter(s => s))}
-                                    />
-                                  </FormControl>
+                                  <FormLabel>Available Colors</FormLabel>
+                                  <Select onValueChange={(value) => {
+                                    if (!field.value.includes(value)) {
+                                      field.onChange([...field.value, value]);
+                                    }
+                                  }}>
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select colors" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="White">White</SelectItem>
+                                      <SelectItem value="Pink">Pink</SelectItem>
+                                      <SelectItem value="Blue">Blue</SelectItem>
+                                      <SelectItem value="Yellow">Yellow</SelectItem>
+                                      <SelectItem value="Green">Green</SelectItem>
+                                      <SelectItem value="Purple">Purple</SelectItem>
+                                      <SelectItem value="Orange">Orange</SelectItem>
+                                      <SelectItem value="Red">Red</SelectItem>
+                                      <SelectItem value="Gray">Gray</SelectItem>
+                                      <SelectItem value="Beige">Beige</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <div className="mt-2 flex flex-wrap gap-1">
+                                    {field.value.map((color, index) => (
+                                      <Badge 
+                                        key={index} 
+                                        variant="secondary" 
+                                        className="cursor-pointer"
+                                        onClick={() => field.onChange(field.value.filter((_, i) => i !== index))}
+                                      >
+                                        {color} ×
+                                      </Badge>
+                                    ))}
+                                  </div>
                                   <FormMessage />
                                 </FormItem>
                               )}
@@ -572,14 +624,41 @@ export default function AdminDashboard() {
                               name="sizes"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Available Sizes (comma-separated)</FormLabel>
-                                  <FormControl>
-                                    <Input 
-                                      placeholder="0-3M, 3-6M, 6-9M, 9-12M" 
-                                      value={field.value.join(", ")}
-                                      onChange={(e) => field.onChange(e.target.value.split(",").map(s => s.trim()).filter(s => s))}
-                                    />
-                                  </FormControl>
+                                  <FormLabel>Available Sizes</FormLabel>
+                                  <Select onValueChange={(value) => {
+                                    if (!field.value.includes(value)) {
+                                      field.onChange([...field.value, value]);
+                                    }
+                                  }}>
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select sizes" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="Newborn">Newborn</SelectItem>
+                                      <SelectItem value="0-3M">0-3 Months</SelectItem>
+                                      <SelectItem value="3-6M">3-6 Months</SelectItem>
+                                      <SelectItem value="6-9M">6-9 Months</SelectItem>
+                                      <SelectItem value="9-12M">9-12 Months</SelectItem>
+                                      <SelectItem value="12-18M">12-18 Months</SelectItem>
+                                      <SelectItem value="18-24M">18-24 Months</SelectItem>
+                                      <SelectItem value="2T">2T</SelectItem>
+                                      <SelectItem value="3T">3T</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <div className="mt-2 flex flex-wrap gap-1">
+                                    {field.value.map((size, index) => (
+                                      <Badge 
+                                        key={index} 
+                                        variant="secondary" 
+                                        className="cursor-pointer"
+                                        onClick={() => field.onChange(field.value.filter((_, i) => i !== index))}
+                                      >
+                                        {size} ×
+                                      </Badge>
+                                    ))}
+                                  </div>
                                   <FormMessage />
                                 </FormItem>
                               )}
