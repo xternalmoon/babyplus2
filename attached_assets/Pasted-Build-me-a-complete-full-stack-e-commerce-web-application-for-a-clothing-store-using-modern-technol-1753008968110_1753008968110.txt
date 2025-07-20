@@ -1,0 +1,140 @@
+Build me a complete, full-stack e-commerce web application for a clothing store using modern technologies. The site will have two separate user roles: User (customer) and Admin (store owner).
+
+I want you to break the application into multiple well-structured pages, not a single-page site. Follow best practices for maintainability, scalability, and performance.
+
+Below is a detailed breakdown of requirements:
+
+💡 General Requirements:
+Use React (or Next.js for SSR) for the frontend.
+
+Use Node.js with Express or Django/Flask for the backend.
+
+Store data in a MongoDB or PostgreSQL database.
+
+Use JWT-based authentication for login/register/session management.
+
+Password encryption (e.g., bcrypt) and proper input validation.
+
+Deploy-ready structure (can be hosted on Replit or Vercel + Render).
+
+🎨 Design/UI Expectations:
+Use a clean, modern design with a clothing-retail-friendly palette:
+
+Primary color: #1E293B (Dark Slate)
+
+Secondary: #F8FAFC (White Smoke)
+
+Accent: #F97316 (Orange) or #10B981 (Emerald)
+
+Use TailwindCSS or Bootstrap 5 for styling.
+
+Mobile-first responsive design with clean card layouts for products.
+
+Smooth page transitions, loading indicators, and error boundaries.
+
+👤 User Side (Customer Features):
+Pages:
+
+Home Page: Show featured products, search bar, categories (Men, Women, Baby), and banner slider.
+
+Shop Page: Paginated list of all products with filters:
+
+Gender: Men, Women, Baby
+
+Category: Shirt, Pants, Dress, Jacket, Accessories, etc.
+
+Size: S, M, L, XL, XXL
+
+Price Range
+
+Search Functionality: Real-time search with suggestions.
+
+Product Detail Page: With size options, color swatches, description, price, add-to-cart, etc.
+
+Cart Page: Add/update/delete items, show total price, taxes.
+
+Checkout Page: Billing form, address, and mock payment (can integrate Stripe later).
+
+Login/Register Page
+
+User Profile Page:
+
+View and edit profile
+
+Order history with statuses (Processing, Shipped, Delivered)
+
+🛒 Admin Side (Admin Panel Features):
+Separate login and dashboard from regular users.
+Pages:
+
+Admin Dashboard:
+
+Overview of total sales, orders, top-selling products.
+
+Orders Management:
+
+View all orders, filter by status, update status (e.g., Shipped/Delivered)
+
+Products Management:
+
+Add new product (title, description, price, size options, color, gender category, image upload)
+
+Edit/delete product
+
+Inventory Management: Track stock per product/size.
+
+User Management: View registered users (optional).
+
+Category Management: Add/edit/delete product categories.
+
+🔐 Authentication:
+Register/Login system using email & password.
+
+Role-based access:
+
+Users can only access shopping pages.
+
+Admins can only access dashboard and admin routes.
+
+Secure session management (store tokens in HttpOnly cookies or secure localStorage).
+
+✨ Extra Features (Bonus/Advanced):
+Wishlist/Favorites feature for users.
+
+Product reviews and ratings by users.
+
+Email notifications on order confirmation (mock/email service).
+
+Dark Mode toggle.
+
+SEO-friendly URLs (e.g., /product/tshirt-oversize-123).
+
+Infinite scrolling on shop pages.
+
+Discounts/Promo codes functionality.
+
+Out of stock badge and disable purchase for out-of-stock sizes.
+
+Admin product import/export via CSV.
+
+PWA support (Progressive Web App – optional).
+
+🔧 Technical Best Practices:
+Use environment variables for sensitive data (API keys, DB URIs).
+
+Folder structure should separate routes, controllers, services, and components.
+
+Use async/await for all DB interactions with proper error handling.
+
+Use React Router or Next.js routing for navigation.
+
+Proper pagination and loading states.
+
+✅ Final Deliverables:
+Full source code with comments.
+
+README file with setup instructions.
+
+Seed script for demo data (products, categories, users).
+
+Working demo if possible (on Replit or linked to Vercel/Render).
